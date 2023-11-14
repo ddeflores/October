@@ -1,39 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using OCTOBER.EF.Data;
 using OCTOBER.EF.Models;
-using OCTOBER.Shared;
-using Telerik.DataSource;
-using Telerik.DataSource.Extensions;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Linq.Dynamic.Core;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Microsoft.CodeAnalysis;
-using AutoMapper;
 using OCTOBER.Server.Controllers.Base;
 using OCTOBER.Shared.DTO;
+using System.Diagnostics;
 
 namespace OCTOBER.Server.Controllers.UD
 {
-    [Route("api/[controller]")]
-    [ApiController]
-
-    public class StudentController : BaseController, GenericRestController<StudentDTO>
+    public class GradeController : BaseController, GenericRestController<GradeDTO>
     {
-
-        public StudentController(OCTOBEROracleContext context,
-    IHttpContextAccessor httpContextAccessor,
-    IMemoryCache memoryCache)
-: base(context, httpContextAccessor)
+        public GradeController(OCTOBEROracleContext context,
+            IHttpContextAccessor httpContextAccessor,
+            IMemoryCache memoryCache)
+        : base(context, httpContextAccessor)
         {
         }
 
         [HttpDelete]
-        [Route("Delete/{StudentID}")]
-        public async Task<IActionResult> Delete(int StudentID)
+        [Route("Delete/{GradeCodeOccurrence}")]
+        public async Task<IActionResult> Delete(int GradeCodeOccurence)
         {
 
             Debugger.Launch();
@@ -42,11 +29,11 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Students.Where(x => x.StudentId == StudentID).FirstOrDefaultAsync();
+                var itm = await _context.Grades.Where(x => x.GradeCodeOccurrence == GradeCodeOccurence).FirstOrDefaultAsync();
 
                 if (itm != null)
                 {
-                    _context.Students.Remove(itm);
+                    _context.Grades.Remove(itm);
                 }
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
@@ -69,21 +56,19 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var result = await _context.Students.Select(sp => new StudentDTO
+                var result = await _context.Grades.Select(sp => new GradeDTO
                 {
+                    GradeCodeOccurrence = sp.GradeCodeOccurrence,
+                    Comments = sp.Comments,
+                    CreatedBy = sp.CreatedBy,
+                    CreatedDate = sp.CreatedDate,
+                    GradeTypeCode = sp.GradeTypeCode,
+                    ModifiedBy = sp.ModifiedBy,
+                    ModifiedDate = sp.ModifiedDate,
+                    NumericGrade = sp.NumericGrade,
+                    SchoolId = sp.SchoolId,
+                    SectionId = sp.SectionId,
                     StudentId = sp.StudentId,
-                     CreatedBy = sp.CreatedBy,
-                      CreatedDate = sp.CreatedDate,
-                       Employer = sp.Employer,
-                        FirstName = sp.FirstName,
-                         LastName = sp.LastName,
-                          ModifiedBy = sp.ModifiedBy,
-                           ModifiedDate = sp.ModifiedDate,
-                            Phone = sp.Phone,
-                             RegistrationDate = sp.RegistrationDate,
-                              Salutation = sp.Salutation,
-                               StreetAddress = sp.StreetAddress,
-                                Zip = sp.Zip
                 })
                 .ToListAsync();
                 await _context.Database.RollbackTransactionAsync();
@@ -98,32 +83,30 @@ namespace OCTOBER.Server.Controllers.UD
         }
 
         [HttpGet]
-        [Route("Get/{SchoolID}/{StudentID}")]
-        public async Task<IActionResult> Get(int SchoolID, int StudentID)
+        [Route("Get/{SchoolID}/{GradeCodeOccurrence}")]
+        public async Task<IActionResult> Get(int SchoolID, int GradeCodeOccurrence)
         {
             try
             {
                 await _context.Database.BeginTransactionAsync();
 
-                StudentDTO? result = await _context
-                    .Students
+                GradeDTO? result = await _context
+                    .Grades
                     .Where(x => x.SchoolId == SchoolID)
-                    .Where(x => x.StudentId == StudentID)
-                     .Select(sp => new StudentDTO
+                    .Where(x => x.GradeCodeOccurrence == GradeCodeOccurrence)
+                     .Select(sp => new GradeDTO
                      {
+                         GradeCodeOccurrence = sp.GradeCodeOccurrence,
+                         SchoolId = sp.SchoolId,
+                         SectionId = sp.SectionId,
                          StudentId = sp.StudentId,
-                          Zip = sp.Zip,
-                           CreatedBy = sp.CreatedBy,
-                            ModifiedDate = sp.ModifiedDate,
-                             CreatedDate = sp.CreatedDate,
-                              Employer = sp.Employer,
-                               FirstName = sp.FirstName,
-                                LastName = sp.LastName,
-                                 ModifiedBy = sp.ModifiedBy,
-                                  Phone = sp.Phone,
-                                   RegistrationDate = sp.RegistrationDate,
-                                    Salutation = sp.Salutation,
-                                     StreetAddress = sp.StreetAddress
+                         Comments = sp.Comments,
+                         CreatedBy = sp.CreatedBy,
+                         CreatedDate = sp.CreatedDate,
+                         GradeTypeCode = sp.GradeTypeCode,
+                         ModifiedBy = sp.ModifiedBy,
+                         ModifiedDate = sp.ModifiedDate,
+                         NumericGrade = sp.NumericGrade
                      })
                 .SingleOrDefaultAsync();
 
@@ -146,7 +129,7 @@ namespace OCTOBER.Server.Controllers.UD
         [HttpPost]
         [Route("Post")]
         public async Task<IActionResult> Post([FromBody]
-                                                StudentDTO _StudentDTO)
+                                                GradeDTO _GradeDTO)
         {
 
             Debugger.Launch();
@@ -155,19 +138,24 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Students.Where(x => x.StudentId == _StudentDTO.StudentId).FirstOrDefaultAsync();
+                var itm = await _context.Grades.Where(x => x.GradeCodeOccurrence == _GradeDTO.GradeCodeOccurrence).FirstOrDefaultAsync();
 
                 if (itm == null)
                 {
-                    Student s = new Student
+                    Grade g = new Grade
                     {
-                         StudentId = _StudentDTO.StudentId,
-                          FirstName = _StudentDTO.FirstName,
-                           LastName = _StudentDTO.LastName,
-                            Phone = _StudentDTO.Phone,
-                             Salutation = _StudentDTO.Salutation
+                        GradeCodeOccurrence = _GradeDTO.GradeCodeOccurrence,
+                        NumericGrade = _GradeDTO.NumericGrade,
+                        ModifiedDate = _GradeDTO.ModifiedDate,
+                        ModifiedBy = _GradeDTO.ModifiedBy,
+                        GradeTypeCode = _GradeDTO.GradeTypeCode,
+                        CreatedBy = _GradeDTO.CreatedBy,
+                        Comments = _GradeDTO.Comments,
+                        StudentId = _GradeDTO.StudentId,
+                        SchoolId = _GradeDTO.SchoolId,
+                        CreatedDate = _GradeDTO.CreatedDate
                     };
-                    _context.Students.Add(s);
+                    _context.Grades.Add(g);
                     await _context.SaveChangesAsync();
                     await _context.Database.CommitTransactionAsync();
                 }
@@ -184,7 +172,7 @@ namespace OCTOBER.Server.Controllers.UD
         [HttpPut]
         [Route("Put")]
         public async Task<IActionResult> Put([FromBody]
-                                                Student _StudentDTO)
+                                                GradeDTO _GradeDTO)
         {
 
             Debugger.Launch();
@@ -193,12 +181,14 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Students.Where(x => x.StudentId == _StudentDTO.StudentId).FirstOrDefaultAsync();
+                var itm = await _context.Grades.Where(x => x.GradeCodeOccurrence == _GradeDTO.GradeCodeOccurrence).FirstOrDefaultAsync();
 
-                itm.FirstName = _StudentDTO.FirstName;
-                itm.LastName = _StudentDTO.LastName;
+                itm.GradeCodeOccurrence = _GradeDTO.GradeCodeOccurrence;
+                itm.NumericGrade = _GradeDTO.NumericGrade;
+                itm.GradeTypeCode = _GradeDTO.GradeTypeCode;
+                itm.SectionId = _GradeDTO.SectionId;
 
-                _context.Students.Update(itm);
+                _context.Grades.Update(itm);
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
 
@@ -209,12 +199,8 @@ namespace OCTOBER.Server.Controllers.UD
                 await _context.Database.RollbackTransactionAsync();
                 //List<OraError> DBErrors = ErrorHandling.TryDecodeDbUpdateException(Dex, _OraTranslateMsgs);
                 return StatusCode(StatusCodes.Status417ExpectationFailed, "An Error has occurred");
-            }
-        }
 
-        public Task<IActionResult> Put([FromBody] StudentDTO _T)
-        {
-            throw new NotImplementedException();
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OCTOBER.Shared.DTO
 {
-    internal class GradeTypeWeightDTO
+    public class GradeTypeWeightDTO
     {
         [Precision(8)]
         public int SchoolId { get; set; }

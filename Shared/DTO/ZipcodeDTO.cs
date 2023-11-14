@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OCTOBER.Shared.DTO
 {
-    internal class ZipcodeDTO
+    public class ZipcodeDTO
     {
         [StringLength(5)]
         [Unicode(false)]

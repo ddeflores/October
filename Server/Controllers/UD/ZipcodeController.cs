@@ -1,39 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using OCTOBER.EF.Data;
 using OCTOBER.EF.Models;
-using OCTOBER.Shared;
-using Telerik.DataSource;
-using Telerik.DataSource.Extensions;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System.Linq.Dynamic.Core;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Microsoft.CodeAnalysis;
-using AutoMapper;
 using OCTOBER.Server.Controllers.Base;
 using OCTOBER.Shared.DTO;
+using System.Diagnostics;
 
 namespace OCTOBER.Server.Controllers.UD
 {
-    [Route("api/[controller]")]
-    [ApiController]
-
-    public class StudentController : BaseController, GenericRestController<StudentDTO>
+    public class ZipcodeController : BaseController, GenericRestController<ZipcodeDTO>
     {
-
-        public StudentController(OCTOBEROracleContext context,
-    IHttpContextAccessor httpContextAccessor,
-    IMemoryCache memoryCache)
-: base(context, httpContextAccessor)
+        public ZipcodeController(OCTOBEROracleContext context,
+            IHttpContextAccessor httpContextAccessor,
+            IMemoryCache memoryCache)
+        : base(context, httpContextAccessor)
         {
         }
 
         [HttpDelete]
-        [Route("Delete/{StudentID}")]
-        public async Task<IActionResult> Delete(int StudentID)
+        [Route("Delete/{Zip}")]
+        public async Task<IActionResult> Delete(string Zip)
         {
 
             Debugger.Launch();
@@ -42,11 +29,11 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Students.Where(x => x.StudentId == StudentID).FirstOrDefaultAsync();
+                var itm = await _context.Zipcodes.Where(x => x.Zip == Zip).FirstOrDefaultAsync();
 
                 if (itm != null)
                 {
-                    _context.Students.Remove(itm);
+                    _context.Zipcodes.Remove(itm);
                 }
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
@@ -61,6 +48,11 @@ namespace OCTOBER.Server.Controllers.UD
             }
         }
 
+        public Task<IActionResult> Delete(int KeyVal)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpGet]
         [Route("Get")]
         public async Task<IActionResult> Get()
@@ -69,21 +61,15 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var result = await _context.Students.Select(sp => new StudentDTO
+                var result = await _context.Zipcodes.Select(sp => new ZipcodeDTO
                 {
-                    StudentId = sp.StudentId,
-                     CreatedBy = sp.CreatedBy,
-                      CreatedDate = sp.CreatedDate,
-                       Employer = sp.Employer,
-                        FirstName = sp.FirstName,
-                         LastName = sp.LastName,
-                          ModifiedBy = sp.ModifiedBy,
-                           ModifiedDate = sp.ModifiedDate,
-                            Phone = sp.Phone,
-                             RegistrationDate = sp.RegistrationDate,
-                              Salutation = sp.Salutation,
-                               StreetAddress = sp.StreetAddress,
-                                Zip = sp.Zip
+                    Zip = sp.Zip,
+                     City = sp.City,
+                      CreatedBy = sp.CreatedBy,
+                       CreatedDate = sp.CreatedDate,
+                        ModifiedBy = sp.ModifiedBy,
+                         ModifiedDate = sp.ModifiedDate,
+                          State = sp.State,
                 })
                 .ToListAsync();
                 await _context.Database.RollbackTransactionAsync();
@@ -98,32 +84,26 @@ namespace OCTOBER.Server.Controllers.UD
         }
 
         [HttpGet]
-        [Route("Get/{SchoolID}/{StudentID}")]
-        public async Task<IActionResult> Get(int SchoolID, int StudentID)
+        [Route("Get/{Zip}")]
+        public async Task<IActionResult> Get(string Zip)
         {
             try
             {
                 await _context.Database.BeginTransactionAsync();
 
-                StudentDTO? result = await _context
-                    .Students
-                    .Where(x => x.SchoolId == SchoolID)
-                    .Where(x => x.StudentId == StudentID)
-                     .Select(sp => new StudentDTO
+                ZipcodeDTO? result = await _context
+                    .Zipcodes
+                    .Where(x => x.Zip == Zip)
+                     .Select(sp => new ZipcodeDTO
                      {
-                         StudentId = sp.StudentId,
-                          Zip = sp.Zip,
-                           CreatedBy = sp.CreatedBy,
-                            ModifiedDate = sp.ModifiedDate,
-                             CreatedDate = sp.CreatedDate,
-                              Employer = sp.Employer,
-                               FirstName = sp.FirstName,
-                                LastName = sp.LastName,
-                                 ModifiedBy = sp.ModifiedBy,
-                                  Phone = sp.Phone,
-                                   RegistrationDate = sp.RegistrationDate,
-                                    Salutation = sp.Salutation,
-                                     StreetAddress = sp.StreetAddress
+                         Zip = sp.Zip,
+                         City = sp.City,
+                         CreatedBy = sp.CreatedBy,
+                         CreatedDate = sp.CreatedDate,
+                         ModifiedBy = sp.ModifiedBy,
+                         ModifiedDate = sp.ModifiedDate,
+                         State = sp.State,
+
                      })
                 .SingleOrDefaultAsync();
 
@@ -146,7 +126,7 @@ namespace OCTOBER.Server.Controllers.UD
         [HttpPost]
         [Route("Post")]
         public async Task<IActionResult> Post([FromBody]
-                                                StudentDTO _StudentDTO)
+                                                ZipcodeDTO _ZipcodeDTO)
         {
 
             Debugger.Launch();
@@ -155,19 +135,17 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Students.Where(x => x.StudentId == _StudentDTO.StudentId).FirstOrDefaultAsync();
+                var itm = await _context.Zipcodes.Where(x => x.Zip== _ZipcodeDTO.Zip).FirstOrDefaultAsync();
 
                 if (itm == null)
                 {
-                    Student s = new Student
+                    Zipcode z = new Zipcode
                     {
-                         StudentId = _StudentDTO.StudentId,
-                          FirstName = _StudentDTO.FirstName,
-                           LastName = _StudentDTO.LastName,
-                            Phone = _StudentDTO.Phone,
-                             Salutation = _StudentDTO.Salutation
+                        Zip = _ZipcodeDTO.Zip,
+                        City = _ZipcodeDTO.City,
+                        State = _ZipcodeDTO.State
                     };
-                    _context.Students.Add(s);
+                    _context.Zipcodes.Add(z);
                     await _context.SaveChangesAsync();
                     await _context.Database.CommitTransactionAsync();
                 }
@@ -184,7 +162,7 @@ namespace OCTOBER.Server.Controllers.UD
         [HttpPut]
         [Route("Put")]
         public async Task<IActionResult> Put([FromBody]
-                                                Student _StudentDTO)
+                                                ZipcodeDTO _ZipcodeDTO)
         {
 
             Debugger.Launch();
@@ -193,12 +171,13 @@ namespace OCTOBER.Server.Controllers.UD
             {
                 await _context.Database.BeginTransactionAsync();
 
-                var itm = await _context.Students.Where(x => x.StudentId == _StudentDTO.StudentId).FirstOrDefaultAsync();
+                var itm = await _context.Zipcodes.Where(x => x.Zip == _ZipcodeDTO.Zip).FirstOrDefaultAsync();
 
-                itm.FirstName = _StudentDTO.FirstName;
-                itm.LastName = _StudentDTO.LastName;
+                itm.Zip = _ZipcodeDTO.Zip;
+                itm.City = _ZipcodeDTO.City;
+                itm.State = _ZipcodeDTO.State;
 
-                _context.Students.Update(itm);
+                _context.Zipcodes.Update(itm);
                 await _context.SaveChangesAsync();
                 await _context.Database.CommitTransactionAsync();
 
@@ -210,11 +189,6 @@ namespace OCTOBER.Server.Controllers.UD
                 //List<OraError> DBErrors = ErrorHandling.TryDecodeDbUpdateException(Dex, _OraTranslateMsgs);
                 return StatusCode(StatusCodes.Status417ExpectationFailed, "An Error has occurred");
             }
-        }
-
-        public Task<IActionResult> Put([FromBody] StudentDTO _T)
-        {
-            throw new NotImplementedException();
         }
     }
 }

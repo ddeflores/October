@@ -32,8 +32,8 @@ namespace OCTOBER.Server.Controllers.UD
 
 
         [HttpGet]
-        [Route("Get/{CourseNo}")]
-        public async Task<IActionResult> Get(int CourseNo)
+        [Route("Get/{SchoolID}/{CourseNo}")]
+        public async Task<IActionResult> Get(int SchoolID, int CourseNo)
         {
             try
             {
@@ -42,6 +42,7 @@ namespace OCTOBER.Server.Controllers.UD
                 CourseDTO? result = await _context
                     .Courses
                     .Where(x => x.CourseNo == CourseNo)
+                    .Where(x=>x.SchoolId == SchoolID)
                      .Select(sp => new CourseDTO
                      {
                          Cost = sp.Cost,
@@ -197,6 +198,11 @@ namespace OCTOBER.Server.Controllers.UD
                 //List<OraError> DBErrors = ErrorHandling.TryDecodeDbUpdateException(Dex, _OraTranslateMsgs);
                 return StatusCode(StatusCodes.Status417ExpectationFailed, "An Error has occurred");
             }
+        }
+
+        public Task<IActionResult> Get(int KeyVal)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,10 +6,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OCTOBER.Shared.DTO
 {
-    internal class SchoolDTO
+    public class SchoolDTO
     {
         [Precision(8)]
         public int SchoolId { get; set; }
