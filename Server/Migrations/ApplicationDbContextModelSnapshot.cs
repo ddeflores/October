@@ -124,7 +124,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasIndex("Use");
 
-                    b.ToTable("KEYS", "LAB2");
+                    b.ToTable("KEYS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.PersistedGrant", b =>
@@ -189,7 +189,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasIndex("SubjectId", "SessionId", "Type");
 
-                    b.ToTable("PERSISTED_GRANTS", "LAB2");
+                    b.ToTable("PERSISTED_GRANTS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -249,7 +249,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("ASP_NET_ROLE_CLAIMS", "LAB2");
+                    b.ToTable("ASP_NET_ROLE_CLAIMS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -278,7 +278,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ASP_NET_USER_CLAIMS", "LAB2");
+                    b.ToTable("ASP_NET_USER_CLAIMS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -306,7 +306,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ASP_NET_USER_LOGINS", "LAB2");
+                    b.ToTable("ASP_NET_USER_LOGINS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -323,7 +323,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("ASP_NET_USER_ROLES", "LAB2");
+                    b.ToTable("ASP_NET_USER_ROLES", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -348,7 +348,7 @@ namespace OCTOBER.Server.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("ASP_NET_USER_TOKENS", "LAB2");
+                    b.ToTable("ASP_NET_USER_TOKENS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("OCTOBER.Server.Models.ApplicationUser", b =>
@@ -428,7 +428,7 @@ namespace OCTOBER.Server.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("\"NORMALIZED_USER_NAME\" IS NOT NULL");
 
-                    b.ToTable("ASP_NET_USERS", "LAB2");
+                    b.ToTable("ASP_NET_USERS", "UD_DEFLORES");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
